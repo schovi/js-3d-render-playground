@@ -6,10 +6,10 @@ export default class Square {
     const d = size / 2
 
     this.vertices = [
-      new Vertex(center.x - d, 10, center.y + d),
-      new Vertex(center.x + d, 10, center.y + d),
-      new Vertex(center.x + d, 10, center.y - d),
-      new Vertex(center.x - d, 10, center.y - d)
+      new Vertex(center.x - d, 0, center.y + d),
+      new Vertex(center.x + d, 0, center.y + d),
+      new Vertex(center.x + d, 0, center.y - d),
+      new Vertex(center.x - d, 0, center.y - d)
     ]
   }
 

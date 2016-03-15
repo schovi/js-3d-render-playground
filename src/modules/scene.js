@@ -18,8 +18,10 @@ const applyHiDPICanvas = (canvas, width, height, ratio) => {
 }
 
 export default class Scene {
-  constructor({objects, dx, dy, canvas, width, height, projection, ratio}) {
+  constructor({objects, dx, dy, canvas, camera, width, height, projection, ratio}) {
     const context   = this.context = canvas.getContext('2d')
+
+    this.camera     = camera
     this.canvas     = canvas
     this.objects    = objects
     this.width      = width
@@ -101,8 +103,8 @@ export default class Scene {
           vertex2 = face[0]
         }
 
-        const p1 = this.projection(vertex1)
-        const p2 = this.projection(vertex2)
+        const p1 = this.projection(vertex1, this.camera)
+        const p2 = this.projection(vertex2, this.camera)
 
         this.line(p1.x, p1.y, p2.x, p2.y, color)
       })
