@@ -1,0 +1,18 @@
+{
+  "name": "playground",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "wserve",
+    "build": "NODE_ENV=production rm -rf dist && wbuild"
+  },
+  "devDependencies": {
+    "babel-preset-es2015": "6.5.0",
+    "babel-preset-react": "6.5.0",
+    "babel-preset-react-hmre": "1.1.0"
+  },
+  "dependencies": {
+    "react": "0.14.7",
+    "react-dom": "0.14.7",
+    "webpackman": "0.3.2"
+  }
+}
