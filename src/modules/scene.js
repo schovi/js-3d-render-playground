@@ -24,17 +24,16 @@ export default class Scene {
     this.camera     = camera
     this.canvas     = canvas
     this.objects    = objects
-    this.width      = width
-    this.height     = height
     this.dx         = dx || width / 2
     this.dy         = dy || height / 2
     this.projection = projection
+    this.ration     = ratio
 
     // Setup canvas styling
     applyHiDPICanvas(canvas, width, height, ratio || getPixelRation(context))
 
-    this.imageData = context.createImageData(1,1)
-    this.pixelData = this.imageData.data
+    this.width      = this.canvas.width
+    this.height     = this.canvas.height
 
     this.objects   = []
   }
@@ -43,19 +42,14 @@ export default class Scene {
     this.draw('clearRect', 0, 0, this.canvas.width, this.canvas.height)
   }
 
-  // pixel(x, y, [r, g, b, a]) {
-  //   // Fill color
-  //   this.pixelData[0]   = r;
-  //   this.pixelData[1]   = g;
-  //   this.pixelData[2]   = b;
-  //   this.pixelData[3]   = a;
-  //
-  //   this.context.putImageData(this.imageData, x, y)
-  // }
-
   pixel(x, y, [r, g, b, a]) {
-    this.context.fillStyle = "rgba("+r+","+g+","+b+","+a+")"
-    this.context.fillRect( x, y, 1, 1 )
+    const index = (this.width * Math.round(y) + Math.round(x)) * 4
+
+    // Fill color
+    this.buffer[index + 0] = r;
+    this.buffer[index + 1] = g;
+    this.buffer[index + 2] = b;
+    this.buffer[index + 3] = a;
   }
 
   line(x0, y0, x1, y1, color) {
@@ -99,6 +93,7 @@ export default class Scene {
     object.faces.forEach((face) => {
       face.forEach((vertex1, i) => {
         let vertex2 = face[i + 1]
+
         if(!vertex2) {
           vertex2 = face[0]
         }
@@ -111,11 +106,23 @@ export default class Scene {
     })
   }
 
+  prepareBuffer() {
+    this.imageData = this.context.createImageData(this.width, this.height)
+    this.buffer    = this.imageData.data
+  }
+
+  writeBuffer() {
+    this.context.putImageData(this.imageData, 0, 0)
+  }
+
   mesh(color) {
-    this.clear()
+    this.prepareBuffer()
+
     this.objects.forEach((object) => {
       this.meshObject(object, color)
     })
+
+    this.writeBuffer()
   }
 
   draw(func, ...args) {

@@ -7,8 +7,19 @@ import Scene from './modules/scene'
 import Model from './modules/model'
 import Camera from './modules/camera'
 import headSource from 'raw!./african_head.obj'
+import './lib/FPSMeter'
 
 function run() {
+  const meter = new FPSMeter({
+    interval: 200,
+    theme:    'transparent',
+    smoothing: 1,
+    heat:     true,
+    decimals: false,
+    graph:    1,
+    history:  20
+  });
+
   const white = [255, 255, 255, 255]
   const dx = window.innerWidth / 2
   const dy = window.innerHeight / 2
@@ -40,15 +51,15 @@ function run() {
       const x = camera.y + ((camera.y - vertex3d.y) / t) + dx
       const y = camera.z + ((camera.z - vertex3d.z) / t) + dy
 
-      return new Vertex(x, y)
+      return new Vertex2D(x, y)
     }
   })
 
-  // // Cube
-  // const cubeCenter = new Vertex(100, 100, 0)
-  // const cubeSize   = 40
-  // const cube       = new Cube(cubeCenter, cubeSize)
-  // scene.objects.push(cube)
+  // Cube
+  const cubeCenter = new Vertex(100, 500, 0)
+  const cubeSize   = 40
+  const cube       = new Cube(cubeCenter, cubeSize)
+  scene.objects.push(cube)
 
   // // Square
   // // TODO pozicovani spravne nefunguje :)
@@ -67,6 +78,12 @@ function run() {
 
   scene.objects.push(head)
 
+  // scene.objects.push({
+  //   faces: [
+  //     [new Vertex(0,0,0), new Vertex(5, 10, 5), new Vertex(10, 15, 10)]
+  //   ]
+  // })
+
   scene.mesh([255, 255, 255, 255])
 
   const step = () => {
@@ -75,10 +92,10 @@ function run() {
     //   Math.PI / 250
     // )
 
-    // cube.rotate(
-    //   -Math.PI / 360,
-    //   Math.PI / 360 / 2
-    // )
+    cube.rotate(
+      -Math.PI / 360,
+      Math.PI / 360 / 2
+    )
 
     head.rotate(
       -Math.PI / 100,
@@ -88,6 +105,7 @@ function run() {
 
     scene.mesh([255, 255, 255, 255])
 
+    meter.tick();
     requestAnimationFrame(step)
   }
 
