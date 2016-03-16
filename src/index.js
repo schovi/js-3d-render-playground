@@ -23,27 +23,25 @@ function run() {
     camera: camera,
 
     // // Ortographic View
-    projection: (vertex3d) => {
-      const d = 20
-
-      const x = vertex3d.x + dx
-      const y = vertex3d.z + dy
-
-      return new Vertex(x, y)
-    }
-
-    // // Perspective View
-    // projection: (vertex3d, camera) => {
-    //   const d = 100
-    //   const t = (camera.x - vertex3d.x) / d
-    //
-    //   // Původně mi vyšlo mínus v: camera.y - (...)
-    //   // Ale tím se osy posouvaly opačně, takže jsem to otočil na plus :)
-    //   const x = camera.y + ((camera.y - vertex3d.y) / t) + dx
-    //   const y = camera.z + ((camera.z - vertex3d.z) / t) + dy
+    // projection: (vertex3d) => {
+    //   const x = vertex3d.x + dx
+    //   const y = vertex3d.z + dy
     //
     //   return new Vertex(x, y)
     // }
+
+    // Perspective View
+    projection: (vertex3d, camera) => {
+      const d = 100
+      const t = (camera.x - vertex3d.x) / d
+
+      // Původně mi vyšlo mínus v: camera.y - (...)
+      // Ale tím se osy posouvaly opačně, takže jsem to otočil na plus :)
+      const x = camera.y + ((camera.y - vertex3d.y) / t) + dx
+      const y = camera.z + ((camera.z - vertex3d.z) / t) + dy
+
+      return new Vertex(x, y)
+    }
   })
 
   // // Cube
@@ -93,7 +91,7 @@ function run() {
     requestAnimationFrame(step)
   }
 
-  // requestAnimationFrame(step)
+  requestAnimationFrame(step)
 }
 
 run()
