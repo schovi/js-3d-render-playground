@@ -14,17 +14,19 @@ function run() {
     interval: 200,
     theme:    'transparent',
     smoothing: 1,
-    heat:     true,
+    // heat:     true,
     decimals: false,
-    graph:    1,
-    history:  20
+    // graph:    1,
+    // history:  20
   });
 
   const white = [255, 255, 255, 255]
   const dx = window.innerWidth / 2
   const dy = window.innerHeight / 2
 
-  const camera = new Camera(new Vertex(-110, 0, 0))
+  const camera = new Camera(new Vertex(-100, 0, 0))
+
+  let d = 100
 
   const scene = new Scene({
     canvas: document.getElementById("canvas"),
@@ -43,7 +45,7 @@ function run() {
 
     // Perspective View
     projection: (vertex3d, camera) => {
-      const d = 100
+      // const d = 300
       const t = (camera.x - vertex3d.x) / d
 
       // Původně mi vyšlo mínus v: camera.y - (...)
@@ -56,10 +58,10 @@ function run() {
   })
 
   // Cube
-  const cubeCenter = new Vertex(100, 500, 0)
+  const cubeCenter = new Vertex(100, 0, 0)
   const cubeSize   = 40
   const cube       = new Cube(cubeCenter, cubeSize)
-  scene.objects.push(cube)
+  // scene.objects.push(cube)
 
   // // Square
   // // TODO pozicovani spravne nefunguje :)
@@ -75,41 +77,92 @@ function run() {
 
   // Model
   const head = new Model(headSource)
-
   scene.objects.push(head)
 
+  // // Custom shape
   // scene.objects.push({
   //   faces: [
-  //     [new Vertex(0,0,0), new Vertex(5, 10, 5), new Vertex(10, 15, 10)]
+  //     [new Vertex(-3, 2, 1), new Vertex(3, 13, 11)]//, new Vertex(10, 70, 45)]
   //   ]
   // })
 
-  scene.mesh([255, 255, 255, 255])
+  // Initial render
+
+  const render = () => {
+    scene.mesh([255, 255, 255, 255])
+    meter.tick();
+  }
+
+  render()
 
   const step = () => {
-    // square.rotate(
-    //   -Math.PI / 180,
-    //   Math.PI / 250
-    // )
-
-    cube.rotate(
-      -Math.PI / 360,
-      Math.PI / 360 / 2
-    )
-
     head.rotate(
       -Math.PI / 100,
       Math.PI / 50,
       new Vertex(0, 0, 0)
     )
 
-    scene.mesh([255, 255, 255, 255])
-
-    meter.tick();
+    render()
     requestAnimationFrame(step)
   }
 
-  requestAnimationFrame(step)
+  // requestAnimationFrame(step)
+
+  let isMousedown = false
+  let lastMouseX
+  let lastMouseY
+  let pendingMouseX
+  let pendingMouseY
+
+  document.addEventListener('mousedown', (event) => {
+    isMousedown = true
+    lastMouseX  = event.clientX
+    lastMouseY  = event.clientY
+  })
+
+  document.addEventListener('mouseup', () => isMousedown = false )
+
+  let pendingFrame
+
+  const mousemoveStep = () => {
+    const targetMouseX = pendingMouseX
+    const targetMouseY = pendingMouseY
+
+    var theta = (targetMouseX - lastMouseX) * Math.PI / 360 * -1
+    var phi = (targetMouseY - lastMouseY) * Math.PI / 180
+
+    head.rotate(
+      theta,
+      phi,
+      new Vertex(0, 0, 0)
+    )
+
+    lastMouseX = targetMouseX
+    lastMouseY = targetMouseY
+
+    render()
+
+    pendingFrame = undefined
+  }
+
+  document.addEventListener('mousemove', (event) => {
+    pendingMouseX = event.clientX
+    pendingMouseY = event.clientY
+
+    if(isMousedown && !pendingFrame) {
+      pendingFrame = requestAnimationFrame(mousemoveStep)
+    }
+  })
+
+  document.addEventListener('mousewheel', (event) => {
+    const delta = Math.max(-1, Math.min(1, (event.wheelDelta || -event.detail)));
+
+    d += delta * 4
+
+    render()
+
+    event.preventDefault()
+  })
 }
 
 run()

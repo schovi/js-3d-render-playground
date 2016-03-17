@@ -43,7 +43,15 @@ export default class Scene {
   }
 
   pixel(x, y, [r, g, b, a]) {
-    const index = (this.width * Math.round(y) + Math.round(x)) * 4
+    x = Math.round(x)
+    y = Math.round(y)
+
+    // Check for pixels outside of viewport
+    if(x < 0 || x >= this.width || y < 0 || y > this.height) {
+      return
+    }
+
+    const index = (this.width * y + x) * 4
 
     // Fill color
     this.buffer[index + 0] = r;
@@ -52,6 +60,8 @@ export default class Scene {
     this.buffer[index + 3] = a;
   }
 
+  // Bresenham's line algorithm
+  // https://en.m.wikipedia.org/wiki/Bresenham%27s_line_algorithm
   line(x0, y0, x1, y1, color) {
     // Normalize to center of rendering
     let swap = false
@@ -65,13 +75,14 @@ export default class Scene {
       [x0, x1, y0, y1] = [x1, x0, y1, y0]
     }
 
-    const dx = x1 - x0
-    const dy = y1 - y0
-    const derror = Math.abs(dy) * 2
+    const dx        = x1 - x0
+    const dy        = y1 - y0
+    const derror    = Math.abs(dy) * 2
     const errorStep = dx * 2
     const yStep     = (y1 > y0 ? 1 : -1)
-    let   error  = 0
-    let   y      = y0
+
+    let   error     = 0
+    let   y         = y0
 
     for(let x = x0; x < x1; x += 1) {
       if(swap) {
@@ -125,10 +136,10 @@ export default class Scene {
     this.writeBuffer()
   }
 
-  draw(func, ...args) {
-    // console.log('draw: ', func, args)
-    this.context[func](...args)
-  }
+  // draw(func, ...args) {
+  //   // console.log('draw: ', func, args)
+  //   this.context[func](...args)
+  // }
 
   // renderObject(object) {
   //   const { context, dx, dy, projection } = this
